@@ -1,5 +1,5 @@
 import React,{useState} from "react";
-import { View, Text, Image, useWindowDimensions } from "react-native";
+import { View, Text, Image, useWindowDimensions, TextInput } from "react-native";
 import Logo from "../../../assets/images/Logo_1.png";
 import { styles } from "../../styled/style";
 import CustomInput from "../../components/CustomInput";
@@ -25,18 +25,20 @@ const SignInScreen = () => {
   return (
     <View style={styles.root}>
       <Image source={Logo} style={[styles.logo, { height: height * 0.3 }]} resizeMode="contain" />
-      <CustomInput
-        placeholder='Username'
-        value={username}
-        setValue={setUsername}
-        secureTextEntry={false }
-      />
-      <CustomInput
-        placeholder="Password"
-        value={password}
-        setValue={setPassword}
-        secureTextEntry={true}
-      />
+      {/*<CustomInput*/}
+      {/*  placeholder='Username'*/}
+      {/*  value={username}*/}
+      {/*  setValue={setUsername}*/}
+      {/*  secureTextEntry={false }*/}
+      {/*/>*/}
+      {/*<CustomInput*/}
+      {/*  placeholder="Password"*/}
+      {/*  value={password}*/}
+      {/*  setValue={setPassword}*/}
+      {/*  secureTextEntry={true}*/}
+      {/*/>*/}
+      <TextInput placeholder="username"/>
+      <TextInput placeholder="Password"/>
       <CustomButton
         text="Sign In"
         onPress={onSinInPress}
