@@ -1,47 +1,71 @@
-import React,{useState} from "react";
-import { View, Text, Image, useWindowDimensions, TextInput } from "react-native";
+import React, { useState } from "react";
+import { View, Text, Image, useWindowDimensions, Alert } from "react-native";
 import Logo from "../../../assets/images/Logo_1.png";
 import { styles } from "../../styled/style";
 import CustomInput from "../../components/CustomInput";
-import CustomButton from '../../components/customButton'
+import CustomButton from "../../components/customButton";
 import SocialSignInButtons from "../../components/SocialSignInButtons";
-import {useNavigation} from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
+import { useForm, Controller } from "react-hook-form";
+import { Auth } from "aws-amplify";
 
 const SignInScreen = () => {
-  const [username,setUsername] = useState('')
-  const [password,setPassword] = useState('')
+  const [loading, setLoading] = useState(false);
   const { height } = useWindowDimensions();
-  const navigation = useNavigation()
-
-  const onSinInPress =()=>{
-    navigation.navigate("Home")
-  }
-  const onForgotPasswordPress =()=>{
-    navigation.navigate("ForgotPassword")
-  }
-  const onSignUpPress =() =>{
-    navigation.navigate("SignUp")
-  }
+  const navigation = useNavigation();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const onSinInPress = async (data) => {
+    if (loading) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await Auth.signIn(data.username, data.password);
+      console.log(response);
+      navigation.navigate("Home");
+    } catch (e) {
+      Alert.alert("Ops", e.message);
+    }
+    setLoading(false);
+  };
+  const onForgotPasswordPress = () => {
+    navigation.navigate("ForgotPassword");
+  };
+  const onSignUpPress = () => {
+    navigation.navigate("SignUp");
+  };
   return (
     <View style={styles.root}>
       <Image source={Logo} style={[styles.logo, { height: height * 0.3 }]} resizeMode="contain" />
-      {/*<CustomInput*/}
-      {/*  placeholder='Username'*/}
-      {/*  value={username}*/}
-      {/*  setValue={setUsername}*/}
-      {/*  secureTextEntry={false }*/}
-      {/*/>*/}
-      {/*<CustomInput*/}
-      {/*  placeholder="Password"*/}
-      {/*  value={password}*/}
-      {/*  setValue={setPassword}*/}
-      {/*  secureTextEntry={true}*/}
-      {/*/>*/}
-      <TextInput placeholder="username"/>
-      <TextInput placeholder="Password"/>
+      <CustomInput
+        control={control}
+        name="username"
+        placeholder="Username"
+        secureTextEntry={false}
+        rules={{ required: "Username is required" }}
+      />
+      <CustomInput
+        control={control}
+        name="password"
+        placeholder="Password"
+        secureTextEntry={true}
+        rules={{
+          required: "Password is required",
+          minLength: {
+            value: 3,
+            message: "Password should be minimum 3 characters long",
+          },
+
+        }}
+      />
+
       <CustomButton
-        text="Sign In"
-        onPress={onSinInPress}
+        text={loading ? "Loading...":"Sign In"}
+        onPress={handleSubmit(onSinInPress)}
         type="PRIMARY"
       />
       <CustomButton
@@ -49,7 +73,7 @@ const SignInScreen = () => {
         onPress={onForgotPasswordPress}
         type="TERTIARY"
       />
-      <SocialSignInButtons/>
+      <SocialSignInButtons />
       <CustomButton
         text="Don't have account ? create one"
         onPress={onSignUpPress}

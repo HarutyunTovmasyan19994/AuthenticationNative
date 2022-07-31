@@ -1,33 +1,51 @@
 import React, { useState } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Alert } from "react-native";
 import { styles } from "../../styled/style";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/customButton";
 import { useNavigation } from "@react-navigation/native";
+import { useForm } from "react-hook-form";
+import { Auth } from "aws-amplify";
 
 const ForgotPasswordScreen = () => {
-  const [username, setUsername] = useState("");
+  const { control, handleSubmit } = useForm();
   const navigation = useNavigation();
 
-  const onSendPressed = () => {
-    navigation.navigate("NewPassword")
+  const onSendPressed = async (data) => {
+    try {
+      await Auth.forgotPassword(data.username);
+      navigation.navigate("NewPassword")
+    } catch (e) {
+      Alert.alert("Oops", e.message);
+    }
   };
   const onSignInPress = () => {
-   navigation.navigate("SignIn")
+    navigation.navigate("SignIn");
   };
 
   return (
     <View style={styles.root}>
       <Text style={styles.title}>Reset your Password</Text>
       <CustomInput
+        name="forgotPassword"
+        control={control}
         placeholder="Username"
-        value={username}
-        setValue={setUsername}
         secureTextEntry={false}
+        rules={{
+          required: "Username is required",
+          minLength: {
+            value: 3,
+            message: "Username should be at least 3 characters long",
+          },
+          maxLength: {
+            value: 24,
+            message: "Username should be at least 24 characters long",
+          },
+        }}
       />
       <CustomButton
         text="Send"
-        onPress={onSendPressed}
+        onPress={handleSubmit(onSendPressed)}
         type="PRIMARY"
       />
 

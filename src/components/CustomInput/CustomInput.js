@@ -1,15 +1,18 @@
 import React from "react";
-import {View,TextInput} from "react-native";
+import { View, TextInput,Text } from "react-native";
 import { styles } from "../../styled/style";
 import { Controller } from "react-hook-form";
 
-const CustomInput = ({control,name,placeholder,secureTextEntry}) => {
+const CustomInput = ({ control, name, rules = {}, placeholder, secureTextEntry }) => {
   return (
-    <View style={styles.container}>
-      <Controller
-        control={control}
-        name={name}
-        render={({ field: { value, onChange, onBlur } }) => (
+
+    <Controller
+      control={control}
+      rules={rules}
+      name={name}
+      render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+        <>
+        <View style={[styles.container,{borderColor: error ? "red":"#e8e8e8"}]}>
           <TextInput
             placeholder={placeholder}
             value={value}
@@ -18,10 +21,14 @@ const CustomInput = ({control,name,placeholder,secureTextEntry}) => {
             onBlur={onBlur}
             secureTextEntry={secureTextEntry}
           />
+        </View>
+          {error &&
+            <Text style={{ color: "red", alignSelf: "stretch" }}>{error.message || "Error"}</Text>
+          }
+        </>
+      )}
+    />
 
-        )}
-      />
-    </View>
   );
 };
 
